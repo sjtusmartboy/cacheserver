@@ -26,7 +26,7 @@ using namespace boost::asio;
 class Service : public boost::enable_shared_from_this<Service>
               , boost::noncopyable
 {
-	//¾²Ì¬Êı¾İ£¬ÊôÓÚËùÓĞÀàµÄ¶ÔÏó¹²Ïí£¬Ö»ĞèÒªÒ»·İ¼´¿É
+	//é™æ€æ•°æ®ï¼Œå±äºæ‰€æœ‰ç±»çš„å¯¹è±¡å…±äº«ï¼Œåªéœ€è¦ä¸€ä»½å³å¯
 	static const std::map<unsigned int, std::string> http_status_table;
 public:
     typedef boost::shared_ptr<Service> ptr;
@@ -53,9 +53,9 @@ public:
 
 	void start_handling() {
 		//std::cout<<"count2="<<m_remotesock.use_count()<<std::endl;
-		//m_sockÊÇshared_ptr£¬shared_ptr.getµÃµ½Ô­ÉúÖ¸ÕëÖ¸Ïòsock£¬Ö®ºóÔÙ½âÒıÓÃµÃµ½sock¶ÔÏó
-		//´ÓsockÖĞ¶ÁÈ¡Êı¾İÖÁm_requestÕâ¸öbufferÀïÃæ£¬¶ÁÍêÒÔºóÊ¹ÓÃon_request_line_received
-		//Õâ¸öº¯Êı·ÖÎöm_requestÊı¾İ
+		//m_sockæ˜¯shared_ptrï¼Œshared_ptr.getå¾—åˆ°åŸç”ŸæŒ‡é’ˆæŒ‡å‘sockï¼Œä¹‹åå†è§£å¼•ç”¨å¾—åˆ°sockå¯¹è±¡
+		//ä»sockä¸­è¯»å–æ•°æ®è‡³m_requestè¿™ä¸ªbufferé‡Œé¢ï¼Œè¯»å®Œä»¥åä½¿ç”¨on_request_line_received
+		//è¿™ä¸ªå‡½æ•°åˆ†æm_requestæ•°æ®
 		//lambda:Class members cannot be captured explicitly by a capture without initializer
 		asio::async_read_until(
 			*m_sock.get(), 
@@ -80,7 +80,7 @@ private:
 
 			if (ec == asio::error::not_found) {
 				// No delimiter has been fonud in the request message.
-				m_response_status_code = 413; // Request Entity Too Large£¨ÇëÇóÊµÌåÌ«´ó£©
+				m_response_status_code = 413; // Request Entity Too Largeï¼ˆè¯·æ±‚å®ä½“å¤ªå¤§ï¼‰
 				send_response();
 				return;
 			}
@@ -92,30 +92,30 @@ private:
 		}
 		
 
-		//m_request»º³åÇøÀïµÄÄÚÈİÊÇ"GET /index.html HTTP/1.1\r\nHost: localhost\r\n";
+		//m_requestç¼“å†²åŒºé‡Œçš„å†…å®¹æ˜¯"GET /index.html HTTP/1.1\r\nHost: localhost\r\n";
 
 		// Parse the request line.
 		std::string request_line;
-		//½«boost::asio::streambufÀàĞÍµÄm_request×ª»¯Îªstd::istreamÀàĞÍµÄrequest_stream
+		//å°†boost::asio::streambufç±»å‹çš„m_requestè½¬åŒ–ä¸ºstd::istreamç±»å‹çš„request_stream
 		std::istream request_stream(&m_request);
 		//std::istream request_stream(&buffer_between_client_and_cacheserver);
 		//istream& getline (istream& is, string& str, char delim);
 		//Extracts characters from is and stores them into str until the delimitation
 		//character delim is found (or the newline character, '\n', for (2)).
 		//getline reads characters from an input stream and places them into a string
-		//´ÓÊäÈëÁ÷request_stream»ñÈ¡ºóÔÚrequest_streamÁ÷Àï»áÒÆ³ırequest_line
-		//request_lineÄÚÈİÊÇGET /index.html HTTP/1.1
+		//ä»è¾“å…¥æµrequest_streamè·å–ååœ¨request_streamæµé‡Œä¼šç§»é™¤request_line
+		//request_lineå†…å®¹æ˜¯GET /index.html HTTP/1.1
 		std::getline(request_stream, request_line, '\r');
 		// Remove symbol '\n' from the buffer.
-		//request_streamËùÖ¸ÏòµÄ»º³åÇøÄÚÈİÎªHost: localhost\r\n
+		//request_streamæ‰€æŒ‡å‘çš„ç¼“å†²åŒºå†…å®¹ä¸ºHost: localhost\r\n
 		request_stream.get();
 
 		// Parse the request line.
 		std::string request_method;
-		//istringstream×÷ÓÃÊÇ´Óstring¶ÔÏórequest_lineÖĞ¶ÁÈ¡×Ö·û¡£
+		//istringstreamä½œç”¨æ˜¯ä»stringå¯¹è±¡request_lineä¸­è¯»å–å­—ç¬¦ã€‚
 		std::istringstream request_line_stream(request_line);
 		request_line_stream >> request_method;
-		//request_streamÄÚÈİÎªindex.html HTTP/1.1
+		//request_streamå†…å®¹ä¸ºindex.html HTTP/1.1
 
 
 
@@ -129,7 +129,7 @@ private:
 		}
 
 		request_line_stream >> m_requested_resource;
-		//request_streamÄÚÈİÎªHTTP/1.1
+		//request_streamå†…å®¹ä¸ºHTTP/1.1
 
 		std::string request_http_version;
 		request_line_stream >> request_http_version;
@@ -502,7 +502,7 @@ private:
 		return;
 	}
 	
-	size_t read_complete(const boost::system::error_code & err, size_t bytes) {
+   size_t read_complete(const boost::system::error_code & err, size_t bytes) {
         if ( err == asio::error::eof ) {
         	return 0;
         }else{
